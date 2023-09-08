@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { useEffect, useRef, useState } from 'react'
 import Img1 from '../../assets/img1.jpg'
 import tutorialsdev from '../../assets/tutorialsdev.png'
 import Input from '../../components/Input'
 import { io } from 'socket.io-client'
+import { useNavigate } from 'react-router-dom'
 
 const Dashboard = () => {
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')))
@@ -12,7 +14,7 @@ const Dashboard = () => {
 	const [users, setUsers] = useState([])
 	const [socket, setSocket] = useState(null)
 	const messageRef = useRef(null)
-
+	const navigate = useNavigate();
 	useEffect(() => {
 		setSocket(io('http://localhost:8080'))
 	}, [])
@@ -20,7 +22,7 @@ const Dashboard = () => {
 	useEffect(() => {
 		socket?.emit('addUser', user?.id);
 		socket?.on('getUsers', users => {
-			console.log('activeUsers :>> ', users);
+			console.log('activeUsers ', users);
 		})
 		socket?.on('getMessage', data => {
 			setMessages(prev => ({
@@ -71,6 +73,7 @@ const Dashboard = () => {
 			}
 		});
 		const resData = await res.json()
+		console.log(resData);
 		setMessages({ messages: resData, receiver, conversationId })
 	}
 
@@ -94,12 +97,13 @@ const Dashboard = () => {
 				receiverId: messages?.receiver?.receiverId
 			})
 		});
+		console.log(message)
 	}
-
+// onClick={navigate("/mydetails")}
 	return (
 		<div className='w-screen flex'>
-			<div className='w-[25%] h-screen bg-secondary overflow-scroll'>
-				<div className='flex items-center my-8 mx-14'>
+			<div   className='w-[25%] h-screen  bg-gray-700 overflow-scroll'>
+				<div onClick={()=>navigate("/mydetails")} className='flex items-center my-8 mx-14'>
 					<div><img src={tutorialsdev} width={75} height={75} className='border border-primary p-[2px] rounded-full' /></div>
 					<div className='ml-8'>
 						<h3 className='text-2xl'>{user?.fullName}</h3>
@@ -120,6 +124,7 @@ const Dashboard = () => {
 												<div className='ml-6'>
 													<h3 className='text-lg font-semibold'>{user?.fullName}</h3>
 													<p className='text-sm font-light text-gray-600'>{user?.email}</p>
+													<p className='text-sm font-bold light text-green-600'>Active</p>
 												</div>
 											</div>
 										</div>
@@ -129,11 +134,11 @@ const Dashboard = () => {
 					</div>
 				</div>
 			</div>
-			<div className='w-[50%] h-screen bg-white flex flex-col items-center'>
+			<div className='w-[50%] h-screen bg-gray-500 flex flex-col items-center'>
 				{
 					messages?.receiver?.fullName &&
-					<div className='w-[75%] bg-secondary h-[80px] my-14 rounded-full flex items-center px-14 py-2'>
-						<div className='cursor-pointer'><img src={Img1} width={60} height={60} className="rounded-full" /></div>
+					<div className='w-full bg-secondary h-[80px] px-9 flex items-center '>
+						<div className='cursor-pointer'><img src={Img1} width={60} height={50} className="rounded-full" /></div>
 						<div className='ml-6 mr-auto'>
 							<h3 className='text-lg'>{messages?.receiver?.fullName}</h3>
 							<p className='text-sm font-light text-gray-600'>{messages?.receiver?.email}</p>
@@ -149,17 +154,48 @@ const Dashboard = () => {
 					</div>
 				}
 				<div className='h-[75%] w-full overflow-scroll shadow-sm'>
-					<div className='p-14'>
+					<div className='p-14 w-full'>
+						{!message?.messages&&
+							<div className='w-full mb-7  flex items-center justify-center'>
+								<div className=' p-2 text-center w-[200px]  border rounded-md bg-neutral-500 '>
+										<h3 className="h-28 font-mono  text-center">										
+												<p>Messages are end to end encryted. No one outside this chat,not even Iboytech Chat  can listen to them</p>
+												
+										</h3>
+								</div>					
+							</div>
+						}
 						{
 							messages?.messages?.length > 0 ?
 								messages.messages.map(({ message, user: { id } = {} }) => {
 									return (
-										<>
-										<div className={`max-w-[40%] rounded-b-xl p-4 mb-6 ${id === user?.id ? 'bg-primary text-white rounded-tl-xl ml-auto' : 'bg-secondary rounded-tr-xl'} `}>{message}</div>
-										<div ref={messageRef}></div>
+										<>																					
+										
+										<div>
+											<div 
+											className={`max-w-[40%] rounded-b-xl p-2 mb-6 
+											${id === user?.id ? 'bg-primary text-white rounded-tl-2xl ml-auto' : 
+											'bg-secondary rounded-tr-xl'} `}>
+												{id === user?.id ?
+												<div>
+													{message}
+													{/* {message?.createAt} */}
+													<span className='flex justify-end'>sent</span><br/>
+												</div>:<div>
+													<span></span>
+													{message}
+												</div>
+											}
+												
+												</div>
+											<div ref={messageRef}></div>
+										</div>
 										</>
 									)
-								}) : <div className='text-center text-lg font-semibold mt-24'>No Messages or No Conversation Selected</div>
+								}) : <div className='text-center text-lg font-semibold mt-24'>											
+											<h3>No Messaage</h3>
+											 
+									</div>
 						}
 					</div>
 				</div>
@@ -185,7 +221,7 @@ const Dashboard = () => {
 					</div>
 				}
 			</div>
-			<div className='w-[25%] h-screen bg-light px-8 py-16 overflow-scroll'>
+			<div className='w-[25%] h-screen bg-gray-700 px-8 py-16 overflow-scroll'>
 				<div className='text-primary text-lg'>People</div>
 				<div>
 					{

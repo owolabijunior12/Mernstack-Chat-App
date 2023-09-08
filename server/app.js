@@ -170,12 +170,14 @@ app.post('/api/message', async (req, res) => {
             await newCoversation.save();
             const newMessage = new Messages({ conversationId: newCoversation._id, senderId, message });
             await newMessage.save();
+            console.log(newMessage);
             return res.status(200).send('Message sent successfully');
         } else if (!conversationId && !receiverId) {
             return res.status(400).send('Please fill all required fields')
         }
         const newMessage = new Messages({ conversationId, senderId, message });
         await newMessage.save();
+        console.log("New Message", newMessage );
         res.status(200).send('Message sent successfully');
     } catch (error) {
         console.log(error, 'Error')

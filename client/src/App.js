@@ -2,6 +2,7 @@ import './App.css';
 import Dashboard from './modules/Dashboard';
 import Form from './modules/Form';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import AccountDetails from './modules/settings/accountDetails';
 
 const ProtectedRoute = ({ children, auth=false }) => {
   const isLoggedIn = localStorage.getItem('user:token') !== null || false;
@@ -12,13 +13,13 @@ const ProtectedRoute = ({ children, auth=false }) => {
     console.log('object :>> ');
     return <Navigate to={'/'} />
   }
-
   return children
 }
 
 function App() {
   return (
     <Routes>
+      <Route path='/mydetails' element={<AccountDetails/>}/>
       <Route path='/' element={
         <ProtectedRoute auth={true}>
           <Dashboard/>
@@ -34,6 +35,7 @@ function App() {
         <Form isSignInPage={false}/>
       </ProtectedRoute>
       } />
+    
     </Routes>
   );
 }
